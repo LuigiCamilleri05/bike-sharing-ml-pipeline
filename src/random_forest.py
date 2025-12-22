@@ -152,6 +152,43 @@ class RandomForestRegressor:
         return np.mean(all_predictions, axis=0)
     
     """
+    Gets parameters for this estimator (sklearn-compatible).
+    Required for sklearn's GridSearchCV/RandomizedSearchCV.
+    
+    Parameters:
+        deep: If True, returns parameters for sub-objects
+        
+    Returns:
+        Dictionary of parameter names and values
+    """
+    def get_params(self, deep=True):
+        return {
+            'n_estimators': self.n_estimators,
+            'max_depth': self.max_depth,
+            'min_samples_split': self.min_samples_split,
+            'min_samples_leaf': self.min_samples_leaf,
+            'max_features': self.max_features,
+            'criterion': self.criterion,
+            'random_state': self.random_state
+        }
+    
+    """
+    Sets parameters for this estimator (sklearn-compatible).
+    Required for sklearn's GridSearchCV/RandomizedSearchCV.
+    
+    Parameters:
+        **params: Dictionary of parameters to set
+        
+    Returns:
+        Self
+    """
+    def set_params(self, **params):
+        for param, value in params.items():
+            if hasattr(self, param):
+                setattr(self, param, value)
+        return self
+    
+    """
     Calculates out-of-bag score for the forest.
     Uses samples not in bootstrap to estimate generalization error.
         

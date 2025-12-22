@@ -6,6 +6,9 @@ env/
 # Dataset splits (generated files)
 Dataset/splits/
 
+# Results (generated files)
+results/
+
 # Python cache
 __pycache__/
 *.py[cod]

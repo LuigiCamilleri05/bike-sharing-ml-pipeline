@@ -20,9 +20,7 @@ def split_data(data_path, output_dir, test_size=0.30, val_ratio=0.50, random_sta
     # Loads the dataset
     df = pd.read_csv(data_path)
 
-    print("=" * 50)
     print("Data splitting")
-    print("=" * 50)
     print(f"\nOriginal dataset shape: {df.shape}")
     print(f"Total samples: {len(df)}")
 
