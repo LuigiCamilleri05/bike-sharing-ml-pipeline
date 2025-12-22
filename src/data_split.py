@@ -3,21 +3,21 @@ from sklearn.model_selection import train_test_split
 import os
 
 """
-    split the bike sharing dataset into training, validation, and test sets.
+Splits the bike sharing dataset into training, validation, and test sets.
 
-    parameters:
-        data_path: path to the hour.csv file
-        output_dir: directory to save the split files
-        test_size: proportion of data for validation + test (default 0.30)
-        val_ratio: ratio to split temp into validation and test (default 0.50)
-        random_state: random seed for reproducibility
-        
-    returns:
-            dict containing the split dataframes and statistics
+Parameters:
+    data_path: Path to the hour.csv file
+    output_dir: Directory to save the split files
+    test_size: Proportion of data for validation + test (default 0.30)
+    val_ratio: Ratio to split temp into validation and test (default 0.50)
+    random_state: Random seed for reproducibility
+    
+Returns:
+    Dictionary containing the split dataframes and statistics
 """
 def split_data(data_path, output_dir, test_size=0.30, val_ratio=0.50, random_state=50):
     
-    # loaded the dataset
+    # Loads the dataset
     df = pd.read_csv(data_path)
 
     print("=" * 50)
@@ -26,20 +26,20 @@ def split_data(data_path, output_dir, test_size=0.30, val_ratio=0.50, random_sta
     print(f"\nOriginal dataset shape: {df.shape}")
     print(f"Total samples: {len(df)}")
 
-    # displayed basic info about the dataset
+    # Displays basic info about the dataset
     print(f"\nFeatures: {list(df.columns)}")
     print(f"Target variable: 'cnt'")
 
-    # defined features (X) and target (y)
-    # dropped non-predictive columns: instant (index), dteday (date string), casual, registered
-    # casual + registered = cnt, so we kept only cnt as target
+    # Defines features (X) and target (y)
+    # Drops non-predictive columns: instant (index), dteday (date string), casual, registered
+    # casual + registered = cnt, so we keep only cnt as target
     X = df.drop(columns=['instant', 'dteday', 'casual', 'registered', 'cnt'])
     y = df['cnt']
 
     print(f"\nFeature columns used: {list(X.columns)}")
     print(f"Number of features: {X.shape[1]}")
 
-    # First split: 70% training, 30% temporary (became validation + test)
+    # First split: 70% training, 30% temporary (becomes validation + test)
     X_train, X_temp, y_train, y_temp = train_test_split(
         X, y, test_size=test_size, random_state=random_state, shuffle=True
     )
