@@ -1,12 +1,5 @@
-"""
-Random forest implementation from scratch using CART decision trees.
-Implements Breiman's Random Forest algorithm with:
-    1. Bootstrap sampling (bagging)
-    2. Random feature selection at each split
-"""
-
-import numpy as np
-from decision_tree import CARTDecisionTreeRegressor, evaluate_model, get_feature_importance
+import numpy as np # Used for numerical operations
+from decision_tree import CARTDecisionTreeRegressor # Importing the CART decision tree implementation
 
 """
 Random forest regressor implemented from scratch.
@@ -21,8 +14,6 @@ Parameters:
     max_features: Number of features to consider at each split
         - 'sqrt': sqrt(n_features)
         - 'log2': log2(n_features)
-        - int: exact number
-        - float: fraction of features
         - None: all features
     criterion: Splitting criterion - 'mse', 'mae', or 'ssr'
     random_state: Random seed for reproducibility
@@ -52,7 +43,7 @@ class RandomForestRegressor:
         y: Training target (numpy array or pandas Series)
     """
     def fit(self, X, y):
-        # Converts to numpy arrays if needed
+        # Converts to numpy arrays
         X = np.array(X)
         y = np.array(y)
         
@@ -111,7 +102,7 @@ class RandomForestRegressor:
     Determines the number of features to consider at each split.
         
     Returns:
-        Integer number of features
+        Number of features
     """
     def _get_max_features(self):
         if self.max_features is None:
@@ -120,10 +111,6 @@ class RandomForestRegressor:
             return max(1, int(np.sqrt(self.n_features)))
         elif self.max_features == 'log2':
             return max(1, int(np.log2(self.n_features)))
-        elif isinstance(self.max_features, int):
-            return min(self.max_features, self.n_features)
-        elif isinstance(self.max_features, float):
-            return max(1, int(self.max_features * self.n_features))
         else:
             return self.n_features
     
@@ -152,8 +139,8 @@ class RandomForestRegressor:
         return np.mean(all_predictions, axis=0)
     
     """
-    Gets parameters for this estimator (sklearn-compatible).
-    Required for sklearn's GridSearchCV/RandomizedSearchCV.
+    Gets parameters for this estimator.
+    Needed to use GridSearchCV/RandomizedSearchCV.
     
     Parameters:
         deep: If True, returns parameters for sub-objects
@@ -187,52 +174,6 @@ class RandomForestRegressor:
             if hasattr(self, param):
                 setattr(self, param, value)
         return self
-    
-    """
-    Calculates out-of-bag score for the forest.
-    Uses samples not in bootstrap to estimate generalization error.
-        
-    Parameters:
-        X: Full training features
-        y: Full training targets
-        
-    Returns:
-        Out-of-bag R² score
-    """
-    def get_oob_score(self, X, y):
-        X = np.array(X)
-        y = np.array(y)
-        n_samples = len(y)
-        
-        # Tracks predictions and counts for each sample
-        oob_predictions = np.zeros(n_samples)
-        oob_counts = np.zeros(n_samples)
-        
-        np.random.seed(self.random_state)
-        
-        for i, (tree, feature_idx) in enumerate(zip(self.trees, self.feature_indices)):
-            # Recreates bootstrap indices to find OOB samples
-            np.random.seed(self.random_state + i if self.random_state else None)
-            bootstrap_indices = np.random.choice(n_samples, size=n_samples, replace=True)
-            oob_mask = np.ones(n_samples, dtype=bool)
-            oob_mask[bootstrap_indices] = False
-            
-            if np.any(oob_mask):
-                oob_pred = tree.predict(X[oob_mask][:, feature_idx])
-                oob_predictions[oob_mask] += oob_pred
-                oob_counts[oob_mask] += 1
-        
-        # Calculates R² for samples with OOB predictions
-        valid_mask = oob_counts > 0
-        if not np.any(valid_mask):
-            return None
-        
-        oob_predictions[valid_mask] /= oob_counts[valid_mask]
-        
-        ss_res = np.sum((y[valid_mask] - oob_predictions[valid_mask]) ** 2)
-        ss_tot = np.sum((y[valid_mask] - np.mean(y[valid_mask])) ** 2)
-        
-        return 1 - (ss_res / ss_tot)
 
 
 """
@@ -243,7 +184,7 @@ Parameters:
     max_depth: Maximum depth of each tree
     min_samples_split: Minimum samples required to split a node
     min_samples_leaf: Minimum samples required in a leaf node
-    max_features: Features to consider at each split ('sqrt', 'log2', int, float)
+    max_features: Features to consider at each split ('sqrt', 'log2', None)
     criterion: Splitting criterion - 'mse', 'mae', or 'ssr'
     random_state: Random seed for reproducibility
     
@@ -262,20 +203,4 @@ def create_random_forest(n_estimators=100, max_depth=None, min_samples_split=2,
         criterion=criterion,
         random_state=random_state
     )
-    return model
-
-
-"""
-Trains the random forest on the training data.
-    
-Parameters:
-    model: RandomForestRegressor instance
-    X_train: Training features
-    y_train: Training target
-    
-Returns:
-    Trained model
-"""
-def train_random_forest(model, X_train, y_train):
-    model.fit(X_train, y_train)
     return model

@@ -1,12 +1,12 @@
-import pandas as pd
-from sklearn.model_selection import train_test_split
-import os
+import pandas as pd # Used to load dataset
+from sklearn.model_selection import train_test_split # Used for splitting dataset
+import os # Used to save split files
 
 """
-Splits the bike sharing dataset into training, validation, and test sets.
+Splits the dataset into training, validation, and test sets.
 
 Parameters:
-    data_path: Path to the hour.csv file
+    data_path: Path to the dataset CSV file
     output_dir: Directory to save the split files
     test_size: Proportion of data for validation + test (default 0.30)
     val_ratio: Ratio to split temp into validation and test (default 0.50)

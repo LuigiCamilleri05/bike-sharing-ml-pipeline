@@ -1,18 +1,11 @@
-"""
-Hyperparameter tuning using sklearn's GridSearchCV and RandomizedSearchCV.
-Uses the from-scratch Random Forest implementation with MSE, MAE, and SSR criteria.
-The from-scratch RF is made sklearn-compatible via get_params/set_params methods.
-"""
-
 import time
-import numpy as np
 from sklearn.model_selection import GridSearchCV, RandomizedSearchCV
 from random_forest import RandomForestRegressor
-from decision_tree import evaluate_model
+from evaluation import evaluate_model
 
 
 """
-Performs Grid Search using sklearn's GridSearchCV with from-scratch Random Forest.
+Performs Grid Search using GridSearchCV with Random Forest.
 
 Parameters:
     param_grid: Dictionary of parameter names and their possible values
@@ -20,20 +13,20 @@ Parameters:
     y_train: Training targets
     cv: Number of cross-validation folds
     scoring: Scoring metric ('r2', 'neg_mean_squared_error', etc.)
-    verbose: Verbosity level
+    verbose: Verbosity level 
 
 Returns:
     Fitted GridSearchCV object
 """
 def grid_search(param_grid, X_train, y_train, cv=3, scoring='r2', verbose=1):
     
-    print(f"\nGrid Search: Using from-scratch RandomForestRegressor")
+    print(f"\nGrid Search: Using RandomForestRegressor")
     print(f"Cross-validation folds: {cv}")
     
-    # Creates base model (from-scratch implementation)
+    # Creates base model
     base_model = RandomForestRegressor(random_state=50)
     
-    # Creates GridSearchCV with from-scratch RF
+    # Creates GridSearchCV with RF
     grid_cv = GridSearchCV(
         estimator=base_model,
         param_grid=param_grid,
@@ -44,6 +37,7 @@ def grid_search(param_grid, X_train, y_train, cv=3, scoring='r2', verbose=1):
         refit=True
     )
     
+    # Times the search
     start_time = time.time()
     grid_cv.fit(X_train, y_train)
     search_time = time.time() - start_time
@@ -56,7 +50,7 @@ def grid_search(param_grid, X_train, y_train, cv=3, scoring='r2', verbose=1):
 
 
 """
-Performs Random Search using sklearn's RandomizedSearchCV with from-scratch Random Forest.
+Performs Random Search using RandomizedSearchCV with Random Forest.
 
 Parameters:
     param_distributions: Dictionary of parameter names and their possible values/distributions
@@ -74,13 +68,13 @@ Returns:
 def random_search(param_distributions, X_train, y_train, n_iter=10, cv=3, 
                   scoring='r2', random_state=50, verbose=1):
     
-    print(f"\nRandom Search: Using from-scratch RandomForestRegressor")
+    print(f"\nRandom Search: Using RandomForestRegressor")
     print(f"Iterations: {n_iter}, CV folds: {cv}")
     
-    # Creates base model (from-scratch implementation)
+    # Creates base model
     base_model = RandomForestRegressor(random_state=50)
     
-    # Creates RandomizedSearchCV with from-scratch RF
+    # Creates RandomizedSearchCV with RF
     random_cv = RandomizedSearchCV(
         estimator=base_model,
         param_distributions=param_distributions,
@@ -105,8 +99,7 @@ def random_search(param_distributions, X_train, y_train, n_iter=10, cv=3,
 
 
 """
-Compares Grid Search and Random Search performance using sklearn's CV methods
-with from-scratch Random Forest.
+Compares Grid Search and Random Search performance
 
 Parameters:
     param_grid: Dictionary of parameter names and their possible values
@@ -126,7 +119,7 @@ def compare_search_methods(param_grid, X_train, y_train, X_test, y_test,
                            n_iter_random=10, cv=3, scoring='r2', random_state=50):
     
     print("\nHyperparameter Tuning Comparison")
-    print("Using sklearn GridSearchCV/RandomizedSearchCV with from-scratch RF")
+    print("Using GridSearchCV/RandomizedSearchCV with RF")
     
     # Calculates total combinations
     n_combinations = 1

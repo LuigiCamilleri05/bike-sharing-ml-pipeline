@@ -1,9 +1,4 @@
-"""
-CART decision tree implementation from scratch.
-"""
-
-# Used for numerical computations
-import numpy as np 
+import numpy as np # Used for numerical computations
 
 """
 Represents a node in the decision tree.
@@ -27,32 +22,28 @@ class Node:
 """
 CART decision tree regressor implemented from scratch.
 Supports multiple splitting criteria: MSE, MAE, and SSR.
+Initialises the decision tree with hyperparameters.
+        
+Parameters:
+    max_depth: Maximum depth of the tree (None for unlimited)
+    min_samples_split: Minimum samples required to split a node
+    min_samples_leaf: Minimum samples required in a leaf node
+    criterion: Splitting criterion - 'mse', 'mae', or 'ssr'
+    max_features: Number of features to consider at each split
+        - None: all features
+        - 'sqrt': sqrt(n_features)
+        - 'log2': log2(n_features)
+        - int: exact number
+        - float: fraction of features
 """
 class CARTDecisionTreeRegressor:
-    """
-    Initialises the decision tree with hyperparameters.
-        
-    Parameters:
-        max_depth: Maximum depth of the tree (None for unlimited)
-        min_samples_split: Minimum samples required to split a node
-        min_samples_leaf: Minimum samples required in a leaf node
-        criterion: Splitting criterion - 'mse', 'mae', or 'ssr'
-            - mse: Mean squared error (variance reduction)
-            - mae: Mean absolute error
-            - ssr: Sum of squared residuals
-        max_features: Number of features to consider at each split
-            - None: all features
-            - 'sqrt': sqrt(n_features)
-            - 'log2': log2(n_features)
-            - int: exact number
-            - float: fraction of features
-    """
+    
     def __init__(self, max_depth=None, min_samples_split=2, min_samples_leaf=1, criterion='mse', max_features=None):
         
         self.max_depth = max_depth
         self.min_samples_split = min_samples_split
         self.min_samples_leaf = min_samples_leaf
-        self.criterion = criterion.lower()
+        self.criterion = criterion
         self.max_features = max_features
         self.root = None
         self.n_features = None
@@ -73,7 +64,7 @@ class CARTDecisionTreeRegressor:
     """    
     def fit(self, X, y):
         
-        # Converts to numpy arrays if needed
+        # Converts to numpy arrays
         X = np.array(X)
         y = np.array(y)
         
@@ -95,7 +86,7 @@ class CARTDecisionTreeRegressor:
     Determines the number of features to consider at each split.
         
     Returns:
-        Integer number of features to consider
+        Number of features to consider
     """
     def _get_n_features_split(self):
         if self.max_features is None:
@@ -104,10 +95,6 @@ class CARTDecisionTreeRegressor:
             return max(1, int(np.sqrt(self.n_features)))
         elif self.max_features == 'log2':
             return max(1, int(np.log2(self.n_features)))
-        elif isinstance(self.max_features, int):
-            return min(self.max_features, self.n_features)
-        elif isinstance(self.max_features, float):
-            return max(1, int(self.max_features * self.n_features))
         else:
             return self.n_features
     
@@ -145,7 +132,7 @@ class CARTDecisionTreeRegressor:
         
         # Splits the data
         left_mask = X[:, best_feature] <= best_threshold
-        right_mask = ~left_mask
+        right_mask = ~left_mask # Complement of left_mask
         
         # Builds child nodes recursively
         left_child = self._build_tree(X[left_mask], y[left_mask], depth + 1)
@@ -183,7 +170,7 @@ class CARTDecisionTreeRegressor:
         if self.n_features_split < self.n_features:
             feature_indices = np.random.choice(self.n_features, self.n_features_split, replace=False)
         else:
-            feature_indices = np.arange(self.n_features)
+            feature_indices = np.arange(self.n_features) # np.arrange creates array [0, 1, ..., n_features-1]
         
         # Iterates over selected features only
         for feature_idx in feature_indices:
@@ -354,87 +341,3 @@ def create_decision_tree(max_depth=None, min_samples_split=2, min_samples_leaf=1
     )
     return model
 
-"""
-Trains the decision tree on the training data.
-    
-Parameters:
-    model: CARTDecisionTreeRegressor instance
-    X_train: Training features
-    y_train: Training target
-    
-Returns:
-    Trained model
-"""
-def train_decision_tree(model, X_train, y_train):
-    
-    model.fit(X_train, y_train)
-    print(f"Trained decision tree with {model.get_n_leaves()} leaves and depth {model.get_depth()}")
-    return model
-
-"""
-Evaluates the model and returns performance metrics.
-    
-Parameters:
-    model: Trained CARTDecisionTreeRegressor
-    X: Features
-    y: True target values
-    dataset_name: Name for display purposes
-    
-Returns:
-    Dictionary with evaluation metrics
-"""
-def evaluate_model(model, X, y, dataset_name="dataset"):
-    
-    # Makes predictions
-    y_pred = model.predict(X)
-    y = np.array(y)
-    
-    # Calculates metrics
-    mse = np.mean((y - y_pred) ** 2)
-    rmse = np.sqrt(mse)
-    mae = np.mean(np.abs(y - y_pred))
-    
-    # Calculates R² score
-    ss_res = np.sum((y - y_pred) ** 2)
-    ss_tot = np.sum((y - np.mean(y)) ** 2)
-    r2 = 1 - (ss_res / ss_tot)
-    
-    # Displays results
-    print(f"\n{dataset_name} performance:")
-    print(f"  MSE:  {mse:.2f}")
-    print(f"  RMSE: {rmse:.2f}")
-    print(f"  MAE:  {mae:.2f}")
-    print(f"  R²:   {r2:.4f}")
-    
-    return {
-        'mse': mse,
-        'rmse': rmse,
-        'mae': mae,
-        'r2': r2,
-        'predictions': y_pred
-    }
-
-"""
-Retrieves and displays feature importances from the trained tree.
-    
-Parameters:
-    model: Trained CARTDecisionTreeRegressor
-    feature_names: List of feature names
-    
-Returns:
-    Dictionary mapping feature names to importance scores
-"""
-def get_feature_importance(model, feature_names):
-    
-    importances = model.feature_importances_
-    
-    # Creates sorted list of (feature, importance) tuples
-    feature_importance = list(zip(feature_names, importances))
-    feature_importance.sort(key=lambda x: x[1], reverse=True)
-    
-    print("\nFeature importances:")
-    for feature, importance in feature_importance:
-        if importance > 0:
-            print(f"  {feature}: {importance:.4f}")
-    
-    return dict(feature_importance)

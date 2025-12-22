@@ -1,14 +1,10 @@
-"""
-Main entry point for the bike sharing prediction project.
-Runs all models in chronological order and saves results.
-"""
-
-import os
-from data_split import split_data
-from decision_tree import create_decision_tree, train_decision_tree, evaluate_model, get_feature_importance
-from random_forest import create_random_forest, train_random_forest
-from hyperparameter_tuning import compare_search_methods
-from visualisation import save_results
+import os # Used for file path manipulations
+from data_split import split_data # Function to split dataset
+from decision_tree import create_decision_tree # Function to create CART decision tree
+from random_forest import create_random_forest # Function to create Random Forest
+from hyperparameter_tuning import compare_search_methods # Function to compare hyperparameter tuning methods
+from evaluation import evaluate_model, get_feature_importance # Evaluation functions
+from visualisation import save_results, save_plots # Functions to save results and plots
 
 
 def main():
@@ -35,21 +31,21 @@ def main():
         'feature_names': feature_names
     }
     
-    # 2. Decision Tree (CART)
-    print("\n2. Decision Tree (CART)")
+    # 2. Decision Tree
+    print("\n2. Decision Tree")
     
     # Creates and trains the CART decision tree
     dt_model = create_decision_tree(max_depth=10, min_samples_leaf=5)
-    dt_model = train_decision_tree(dt_model, splits['X_train'], splits['y_train'])
+    dt_model.fit(splits['X_train'], splits['y_train'])
     
     # Evaluates on all datasets
-    print("\n--- Decision Tree Evaluation ---")
+    print("\nDecision Tree Evaluation")
     dt_train = evaluate_model(dt_model, splits['X_train'], splits['y_train'], "Training set")
     dt_val = evaluate_model(dt_model, splits['X_val'], splits['y_val'], "Validation set")
     dt_test = evaluate_model(dt_model, splits['X_test'], splits['y_test'], "Test set")
     
     # Gets feature importances
-    print("\n--- Decision Tree Feature Importance ---")
+    print("\nDecision Tree Feature Importance")
     dt_importance = get_feature_importance(dt_model, feature_names)
     
     # Stores decision tree results
@@ -63,7 +59,7 @@ def main():
     # 3. Random Forest
     print("\n3. Random Forest")
     
-    # Creates and trains the random forest
+    # Creates and trains the random forest with predefined hyperparameters
     rf_model = create_random_forest(
         n_estimators=50,
         max_depth=10,
@@ -71,16 +67,16 @@ def main():
         max_features='sqrt',
         random_state=50
     )
-    rf_model = train_random_forest(rf_model, splits['X_train'], splits['y_train'])
+    rf_model.fit(splits['X_train'], splits['y_train'])
     
     # Evaluates on all datasets
-    print("\n--- Random Forest Evaluation ---")
+    print("\nRandom Forest Evaluation")
     rf_train = evaluate_model(rf_model, splits['X_train'], splits['y_train'], "Training set")
     rf_val = evaluate_model(rf_model, splits['X_val'], splits['y_val'], "Validation set")
     rf_test = evaluate_model(rf_model, splits['X_test'], splits['y_test'], "Test set")
     
     # Gets feature importances
-    print("\n--- Random Forest Feature Importance ---")
+    print("\nRandom Forest Feature Importance")
     rf_importance = get_feature_importance(rf_model, feature_names)
     
     # Stores random forest results
@@ -91,26 +87,21 @@ def main():
         'feature_importance': rf_importance
     }
     
-    # 4. Random Forest Hyperparameter Tuning (From-Scratch RF)
-    print("\n4. Random Forest Hyperparameter Tuning (From-Scratch RF)")
+    # 4. Random Forest Hyperparameter Tuning
+    print("\n4. Random Forest Hyperparameter Tuning")
     
-    # Defines parameter grid for from-scratch RF
-    # criterion: 'mse', 'mae', 'ssr' (all supported by our CART implementation)
+    # Defines parameter grid for RF and tuning
     rf_param_grid = {
         'n_estimators': [1],
-        'max_depth': [10, 15],
-        'min_samples_leaf': [1, 2],
-        'criterion': ['mse', 'mae', 'ssr']  # All 3 splitting criteria
+        'max_depth': [5],
+        'min_samples_leaf': [2, 5],
+        'criterion': ['mse', 'mae', 'ssr']
     }
     
     print("\nParameter grid:")
     for param, values in rf_param_grid.items():
         print(f"  {param}: {values}")
     
-    # Runs hyperparameter tuning using sklearn's GridSearchCV/RandomizedSearchCV
-    # with from-scratch RandomForestRegressor
-    # Grid: 2*2*2*3 = 24 combinations
-    # Random: 10 random samples
     tuning_results = compare_search_methods(
         param_grid=rf_param_grid,
         X_train=splits['X_train'],
@@ -141,7 +132,6 @@ def main():
     print("\n5. Final Summary")
     
     print(f"\n{'Model':<30} {'Test R²':<12} {'Test RMSE':<12} {'Test MAE':<12}")
-    print("-" * 70)
     print(f"{'Decision Tree':<30} {dt_test['r2']:<12.4f} {dt_test['rmse']:<12.2f} {dt_test['mae']:<12.2f}")
     print(f"{'Random Forest':<30} {rf_test['r2']:<12.4f} {rf_test['rmse']:<12.2f} {rf_test['mae']:<12.2f}")
     print(f"{'RF Tuned (Grid Search)':<30} {tuning_results['grid_test_metrics']['r2']:<12.4f} {tuning_results['grid_test_metrics']['rmse']:<12.2f} {tuning_results['grid_test_metrics']['mae']:<12.2f}")
@@ -149,16 +139,19 @@ def main():
     
     print("\n--- Best Hyperparameters ---")
     print("\nGrid Search:")
-    for param, value in tuning_results['grid_cv'].best_params_.items():
-        print(f"  {param}: {value}")
+    for param in sorted(tuning_results['grid_cv'].best_params_.keys()):
+        print(f"  {param}: {tuning_results['grid_cv'].best_params_[param]}")
     
     print("\nRandom Search:")
-    for param, value in tuning_results['random_cv'].best_params_.items():
-        print(f"  {param}: {value}")
+    for param in sorted(tuning_results['random_cv'].best_params_.keys()):
+        print(f"  {param}: {tuning_results['random_cv'].best_params_[param]}")
     
     # 6. Save Results
     results_dir = os.path.join(base_dir, '..', 'results')
     save_results(results_dir, all_results)
+    
+    # 7. Generate Plots
+    save_plots(results_dir, all_results, splits['y_test'])
     
     print("\nCompleted")
 
