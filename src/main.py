@@ -1,7 +1,7 @@
 import os # Used for file path manipulations
 from data_split import split_data # Function to split dataset
-from decision_tree import create_decision_tree # Function to create CART decision tree
-from random_forest import create_random_forest # Function to create Random Forest
+from decision_tree import CARTDecisionTreeRegressor # CART decision tree regressor
+from random_forest import RandomForestRegressor # Random Forest regressor
 from hyperparameter_tuning import compare_search_methods # Function to compare hyperparameter tuning methods
 from evaluation import evaluate_model, get_feature_importance # Evaluation functions
 from visualisation import save_results, save_plots # Functions to save results and plots
@@ -35,7 +35,7 @@ def main():
     print("\n2. Decision Tree")
     
     # Creates and trains the CART decision tree
-    dt_model = create_decision_tree(max_depth=10, min_samples_leaf=5)
+    dt_model = CARTDecisionTreeRegressor(max_depth=10, min_samples_leaf=5)
     dt_model.fit(splits['X_train'], splits['y_train'])
     
     # Evaluates on all datasets
@@ -60,7 +60,7 @@ def main():
     print("\n3. Random Forest")
     
     # Creates and trains the random forest with predefined hyperparameters
-    rf_model = create_random_forest(
+    rf_model = RandomForestRegressor(
         n_estimators=50,
         max_depth=10,
         min_samples_leaf=5,
@@ -92,8 +92,8 @@ def main():
     
     # Defines parameter grid for RF and tuning
     rf_param_grid = {
-        'n_estimators': [1],
-        'max_depth': [5],
+        'n_estimators': [10, 30],
+        'max_depth': [5, 10, 15],
         'min_samples_leaf': [2, 5],
         'criterion': ['mse', 'mae', 'ssr']
     }

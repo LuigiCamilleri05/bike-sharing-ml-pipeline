@@ -176,31 +176,3 @@ class RandomForestRegressor:
         return self
 
 
-"""
-Creates a random forest regressor with specified hyperparameters.
-    
-Parameters:
-    n_estimators: Number of trees in the forest
-    max_depth: Maximum depth of each tree
-    min_samples_split: Minimum samples required to split a node
-    min_samples_leaf: Minimum samples required in a leaf node
-    max_features: Features to consider at each split ('sqrt', 'log2', None)
-    criterion: Splitting criterion - 'mse', 'mae', or 'ssr'
-    random_state: Random seed for reproducibility
-    
-Returns:
-    RandomForestRegressor instance
-"""
-def create_random_forest(n_estimators=100, max_depth=None, min_samples_split=2,
-                         min_samples_leaf=1, max_features='sqrt', criterion='mse', 
-                         random_state=50):
-    model = RandomForestRegressor(
-        n_estimators=n_estimators,
-        max_depth=max_depth,
-        min_samples_split=min_samples_split,
-        min_samples_leaf=min_samples_leaf,
-        max_features=max_features,
-        criterion=criterion,
-        random_state=random_state
-    )
-    return model

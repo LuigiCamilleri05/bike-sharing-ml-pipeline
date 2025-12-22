@@ -33,8 +33,6 @@ Parameters:
         - None: all features
         - 'sqrt': sqrt(n_features)
         - 'log2': log2(n_features)
-        - int: exact number
-        - float: fraction of features
 """
 class CARTDecisionTreeRegressor:
     
@@ -170,7 +168,7 @@ class CARTDecisionTreeRegressor:
         if self.n_features_split < self.n_features:
             feature_indices = np.random.choice(self.n_features, self.n_features_split, replace=False)
         else:
-            feature_indices = np.arange(self.n_features) # np.arrange creates array [0, 1, ..., n_features-1]
+            feature_indices = np.arange(self.n_features) # Creates array [0, 1, ..., n_features-1]
         
         # Iterates over selected features only
         for feature_idx in feature_indices:
@@ -319,25 +317,4 @@ class CARTDecisionTreeRegressor:
             return 1
         return self._count_leaves(node.left) + self._count_leaves(node.right)
 
-"""
-Creates a CART decision tree regressor with specified hyperparameters.
-    
-Parameters:
-    max_depth: Maximum depth of the tree (None for unlimited)
-    min_samples_split: Minimum samples required to split a node
-    min_samples_leaf: Minimum samples required in a leaf node
-    criterion: Splitting criterion - 'mse', 'mae', or 'ssr'
-    
-Returns:
-    CARTDecisionTreeRegressor instance
-"""
-def create_decision_tree(max_depth=None, min_samples_split=2, min_samples_leaf=1, criterion='mse'):
-    
-    model = CARTDecisionTreeRegressor(
-        max_depth=max_depth,
-        min_samples_split=min_samples_split,
-        min_samples_leaf=min_samples_leaf,
-        criterion=criterion
-    )
-    return model
 
