@@ -1,5 +1,6 @@
 import numpy as np # Used for numerical operations
 from decision_tree import CARTDecisionTreeRegressor # Importing the CART decision tree implementation
+from sklearn.base import BaseEstimator, RegressorMixin
 
 """
 Random forest regressor implemented from scratch.
@@ -18,7 +19,7 @@ Parameters:
     criterion: Splitting criterion - 'mse', 'mae', or 'ssr'
     random_state: Random seed for reproducibility
 """
-class RandomForestRegressor:
+class RandomForestRegressor(BaseEstimator, RegressorMixin):
 
     def __init__(self, n_estimators=100, max_depth=None, min_samples_split=2, 
                  min_samples_leaf=1, max_features='sqrt', criterion='mse', random_state=None):

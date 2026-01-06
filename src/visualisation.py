@@ -126,7 +126,7 @@ def save_tuning_results(output_dir, tuning_results):
                 f.write(f"  {param}: {value}\n")
             f.write("\nTest Set Performance:\n")
             test_metrics = tuning_results.get('grid_test_metrics', {})
-            f.write(f"  R²: {test_metrics.get('r2', 0):.4f}\n")
+            f.write(f"  R^2: {test_metrics.get('r2', 0):.4f}\n")
             f.write(f"  RMSE: {test_metrics.get('rmse', 0):.2f}\n")
             f.write(f"  MAE: {test_metrics.get('mae', 0):.2f}\n")
             f.write("\n")
@@ -140,7 +140,7 @@ def save_tuning_results(output_dir, tuning_results):
                 f.write(f"  {param}: {value}\n")
             f.write("\nTest Set Performance:\n")
             test_metrics = tuning_results.get('random_test_metrics', {})
-            f.write(f"  R²: {test_metrics.get('r2', 0):.4f}\n")
+            f.write(f"  R^2: {test_metrics.get('r2', 0):.4f}\n")
             f.write(f"  RMSE: {test_metrics.get('rmse', 0):.2f}\n")
             f.write(f"  MAE: {test_metrics.get('mae', 0):.2f}\n")
     

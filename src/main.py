@@ -14,11 +14,11 @@ def main():
     # 1. Data Splitting
     print("\n1. Data Splitting")
     
-    base_dir = os.path.dirname(__file__)
-    data_path = os.path.join(base_dir, '..', 'Dataset', 'hour.csv')
-    output_dir = os.path.join(base_dir, '..', 'Dataset', 'splits')
+    base_dir = os.path.dirname(__file__) # Base directory of the script
+    data_path = os.path.join(base_dir, '..', 'Dataset', 'hour.csv') # Path to dataset
+    output_dir = os.path.join(base_dir, '..', 'Dataset', 'splits') # Output directory for splits
     
-    splits = split_data(data_path, output_dir)
+    splits = split_data(data_path, output_dir) # Splits the data and returns dataframes
     feature_names = list(splits['X_train'].columns)
     
     # Stores split information
@@ -92,9 +92,9 @@ def main():
     
     # Defines parameter grid for RF and tuning
     rf_param_grid = {
-        'n_estimators': [10, 30],
+        'n_estimators': [10, 30, 50],
         'max_depth': [5, 10, 15],
-        'min_samples_leaf': [2, 5],
+        'min_samples_leaf': [2, 5, 10],
         'criterion': ['mse', 'mae', 'ssr']
     }
     
